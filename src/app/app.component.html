@@ -1,4 +1,19 @@
-<h1 class="text-3xl font-bold underline">
-  Hello world!
-  {{ randInt() }}
-</h1>
+<div class="w-full h-full">
+  <div class="flex flex-row">
+    <div *ngFor="let pl of players" class="w-full">
+      {{ pl.name }}
+      <div *ngFor="let bid of pl.bids">
+        {{bid.faction}}: {{bid.value}}
+      </div>
+    </div>
+  </div>
+
+  <div *ngFor="let fac of factions" [class]="fac.colorClass + ' '">
+    <div class="flex flex-row w-full justify-around">
+      <div>{{ fac.name }}</div>
+      <div>{{ fac.bid }}</div>
+      <div>{{ fac.player ?? 'not assigned yet' }}</div>
+    </div>
+  </div>
+
+</div>
