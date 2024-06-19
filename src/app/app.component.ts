@@ -5,6 +5,7 @@ import { Color, colorClass, randomDistinctColors } from './shared/models/color.e
 import { factionData, factionsOfColor, randomFactions } from './shared/models/faction-data';
 import { CommonModule } from '@angular/common';
 import { Faction } from './shared/models/faction.enum';
+import { Player } from './shared/models/player.model';
 
 @Component({
   selector: 'app-root',
@@ -13,7 +14,7 @@ import { Faction } from './shared/models/faction.enum';
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })
-export class AppComponent implements OnInit {
+export class AppComponent {
   title = 'gaia-bidding';
 
   turn: number = 0
@@ -27,11 +28,7 @@ export class AppComponent implements OnInit {
   ]
 
 
-  ngOnInit() {
-    console.log(this.players)
-  }
-
-  setupPlayer(name: string) {
+  setupPlayer(name: string): Player {
     let bids = new Map<Faction, number>()
     this._factions.forEach((v) => {
       bids.set(v, randInt(20))
@@ -55,8 +52,25 @@ export class AppComponent implements OnInit {
     return factions
   }
 
+  determineBid(bids: Map<Faction, { value: number, player: Player }>, player: Player) {
+    let bidentries = Array.from(bids.entries())
+    console.log(bidentries)
+    console.log(player)
+    let alreadyLeading = bidentries.some((v) => v[1].player?.name === player.name)
+    if (alreadyLeading) return undefined
+    console.log(player.bids)
+    console.log(bids)
+  }
 
 
+  get currentBids() {
+    let c = Array.from(this.factions.entries())
+    let d: [Faction, any][] = c.map(([faction, data]) => {
+      return [faction, { value: data.bid, player: data.player }]
+    })
+    let e = new Map(d)
+    return e
+  }
 
   /*
   determineBid(biddingState, player) {
