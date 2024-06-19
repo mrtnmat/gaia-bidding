@@ -1,18 +1,19 @@
 <div class="w-full h-full">
+  <div>Turn: {{ turn }}</div>
   <div class="flex flex-row">
     <div *ngFor="let pl of players" class="w-full">
       {{ pl.name }}
-      <div *ngFor="let bid of pl.bids">
-        {{bid.faction}}: {{bid.value}}
+      <div *ngFor="let bid of pl.bids | keyvalue">
+        {{ bid.key }}: {{ bid.value }}
       </div>
     </div>
   </div>
 
-  <div *ngFor="let fac of factions" [class]="fac.colorClass + ' '">
+  <div *ngFor="let fac of factions | keyvalue" [class]="fac.value.colorClass + ' '">
     <div class="flex flex-row w-full justify-around">
-      <div>{{ fac.name }}</div>
-      <div>{{ fac.bid }}</div>
-      <div>{{ fac.player ?? 'not assigned yet' }}</div>
+      <div>{{ fac.key }}</div>
+      <div>{{ fac.value.bid }}</div>
+      <div>{{ fac.value.player ?? 'not assigned yet' }}</div>
     </div>
   </div>
 
