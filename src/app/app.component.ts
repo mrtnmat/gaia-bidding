@@ -52,14 +52,15 @@ export class AppComponent {
     return factions
   }
 
-  determineBid(bids: Map<Faction, { value: number, player: Player }>, player: Player) {
+  determineBid(bids: Map<Faction, { value: number, player: Player }>, biddingPlayer: Player): Faction | undefined {
     let bidentries = Array.from(bids.entries())
-    console.log(bidentries)
-    console.log(player)
-    let alreadyLeading = bidentries.some((v) => v[1].player?.name === player.name)
+    let alreadyLeading = bidentries.some(([_faction, { value, player }]) => player?.name === biddingPlayer.name)
     if (alreadyLeading) return undefined
-    console.log(player.bids)
+    let bidDiff: [Faction, number][] = bidentries.map(([faction, { value, player }]) => [faction, biddingPlayer.bids.get(faction) ?? 0 - value])
     console.log(bids)
+    console.log(biddingPlayer)
+    console.log(bidDiff)
+    return undefined
   }
 
 
