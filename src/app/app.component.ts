@@ -1,16 +1,17 @@
 import { Component, OnInit } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { randInt } from './shared/utils';
+import { randInt, randomArrayElement } from './shared/utils';
 import { Color, colorClass, randomDistinctColors } from './shared/models/color.enum';
 import { factionData, factionsOfColor, randomFactions } from './shared/models/faction-data';
 import { CommonModule } from '@angular/common';
 import { Faction } from './shared/models/faction.enum';
 import { Player } from './shared/models/player.model';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, RouterOutlet],
+  imports: [CommonModule, RouterOutlet, FormsModule],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })
@@ -26,6 +27,7 @@ export class AppComponent {
     this.setupPlayer('John'),
     this.setupPlayer('Alice'),
   ]
+  selectedPlayer: Player = this.players[0]
 
 
   setupPlayer(name: string): Player {
@@ -52,15 +54,34 @@ export class AppComponent {
     return factions
   }
 
-  determineBid(bids: Map<Faction, { value: number, player: Player }>, biddingPlayer: Player): Faction | undefined {
+  determineWhichFactionToBid(bids: Map<Faction, { value: number, player: Player }>, biddingPlayer: Player): Faction | undefined {
     let bidentries = Array.from(bids.entries())
     let alreadyLeading = bidentries.some(([_faction, { value, player }]) => player?.name === biddingPlayer.name)
-    if (alreadyLeading) return undefined
-    let bidDiff: [Faction, number][] = bidentries.map(([faction, { value, player }]) => [faction, biddingPlayer.bids.get(faction) ?? 0 - value])
+    if (alreadyLeading) return undefined // stop bidding if already leading in at least 1 faction
+    let bidDiff: [Faction, number][] = bidentries.map(([faction, { value, player }]) => [faction, (biddingPlayer.bids.get(faction) ?? 0) - value])
     console.log(bids)
     console.log(biddingPlayer)
-    console.log(bidDiff)
-    return undefined
+    console.log(`diff = ${bidDiff}`)
+    let b2 = bidDiff.filter(([faction, value]) => value != 0) // filter factions where I'm already at maxium bidding value
+    console.log(`diff = ${b2}`)
+
+    let max = b2.reduce((acc, [f, value]) => { return value > acc ? value : acc }, 0)
+    let b3 = b2.filter(([faction, value]) => value === max)
+    console.log(`diff = ${b3}`)
+    let b4 = b3.filter(([faction, value]) => bids.get(faction)?.value != -1) // try filtering away all the factions without bets
+    if (b4.length > 0) b3 = b4 // if after filtering there's still at least one valid faction, use the filtered group
+    if (b3.length < 1) return undefined
+    return randomArrayElement(b3)[0] // return a random faction from those eligible
+  }
+
+  placeBid(bids: Map<Faction, { value: number, player: Player }>, biddingPlayer: Player) {
+    let factionToBid = this.determineWhichFactionToBid(bids, biddingPlayer)
+    if (factionToBid) {
+      let currentFaction = this.factions.get(factionToBid)!
+      currentFaction.bid += 1
+      currentFaction.player = biddingPlayer
+    }
+    this.turn += 1
   }
 
 
@@ -72,6 +93,7 @@ export class AppComponent {
     let e = new Map(d)
     return e
   }
+
 
   /*
   determineBid(biddingState, player) {

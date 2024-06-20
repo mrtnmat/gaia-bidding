@@ -6,16 +6,27 @@
       <div *ngFor="let bid of pl.bids | keyvalue">
         {{ bid.key }}: {{ bid.value }}
       </div>
+      <div class="font-mono text-sm">{{ determineWhichFactionToBid(currentBids, pl) }}</div>
     </div>
   </div>
 
   <div *ngFor="let fac of factions | keyvalue" [class]="fac.value.colorClass + ' '">
     <div class="flex flex-row w-full justify-around">
       <div>{{ fac.key }}</div>
-      <div>{{ fac.value.bid }}</div>
-      <div>{{ fac.value.player ?? 'not assigned yet' }}</div>
+      <input [(ngModel)]="fac.value.bid" type="number" min="-1" max="1000" />
+      <div>{{ fac.value.player ? fac.value.player.name : 'not assigned yet' }}</div>
     </div>
   </div>
 
-  <div class="w-32 h-24" (click)="determineBid(currentBids, players[0])">STEP</div>
+  <div class="w-32 h-24" (click)="determineWhichFactionToBid(currentBids, players[0])">STEP</div>
+
+  <div>
+    <label for="player-select">Choose a player:</label>
+
+    <select name="player" id="player-select" [(ngModel)]="selectedPlayer">
+      <option *ngFor="let p of players" [ngValue]="p">{{ p.name }}</option>
+    </select>
+
+    <input type="button" (click)="placeBid(currentBids, selectedPlayer)" value="PLACE BET">
+  </div>
 </div>

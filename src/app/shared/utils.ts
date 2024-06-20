@@ -19,3 +19,9 @@ export function randomMapKey<K, V>(map: Map<K, V>) {
         value: map.get(keysArray[randomIndex]),
     }
 }
+
+export function randomArrayElement<T>(l: T[]): T {
+    if (l.length < 1) throw new ArgumentException('Empty list')
+    let r = randInt(l.length - 1)
+    return l[r]
+}
